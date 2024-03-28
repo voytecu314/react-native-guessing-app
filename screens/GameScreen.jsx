@@ -44,37 +44,41 @@ export default function GameScreen ({userNumber, resetNumber}) {
         
         const newRandomNumber = generateRandomNumberBetweenAndWithout(minBoundry, maxBoundry, currentGuess);
         //console.log({direction, currentGuess, userNumber, rounds: guessedNumbers.length, newRandomNumber});
+       
+        setCurrentGuess(newRandomNumber);
+        setGuessedNumbers([...guessedNumbers, newRandomNumber]);
+    
         if(newRandomNumber == userNumber) {
             setGameOver(true);
             return Alert.alert(`I guessed in ${guessedNumbers.length} rounds!`, `Your number is ${newRandomNumber}`);
         }
-        setCurrentGuess(newRandomNumber);
-        setGuessedNumbers([...guessedNumbers, newRandomNumber]);
     }
 
     return (
         <View style={styles.screen}>
            <Title>App guess</Title>
             <NumberContainer>{currentGuess}</NumberContainer>
-            <Card>
-                <InstructionText style={{marginBottom: 12}}>Higher or Lower</InstructionText>
-                <View style={styles.buttonsContainer}>
-                    <View style={styles.buttonContainer}>
-                        <PrimaryButton onPressHandler={nextGuessHandler.bind(this, 'higher')}>
-                            <Fontisto name="plus-a" size={24} color="white" />
-                        </PrimaryButton>
+            {   !gameOver &&
+                (<Card>
+                    <InstructionText style={{marginBottom: 12}}>Higher or Lower</InstructionText>
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <PrimaryButton onPressHandler={nextGuessHandler.bind(this, 'higher')}>
+                                <Fontisto name="plus-a" size={24} color="white" />
+                            </PrimaryButton>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <PrimaryButton onPressHandler={nextGuessHandler.bind(this, 'lower')}>
+                                <Fontisto name="minus-a" size={24} color="white" />
+                            </PrimaryButton>
+                        </View>
                     </View>
-                    <View style={styles.buttonContainer}>
-                        <PrimaryButton onPressHandler={nextGuessHandler.bind(this, 'lower')}>
-                            <Fontisto name="minus-a" size={24} color="white" />
-                        </PrimaryButton>
-                    </View>
-                </View>
-            </Card>
+                </Card>)
+            }
             <FlatList 
                 data={guessedNumbers}
                 keyExtractor={item=>item}
-                renderItem={({item})=><Text>{item}</Text>}
+                renderItem={({item,index})=><Text style={styles.roundText}>{`Round ${index+1}, guessed number: ${item}`}</Text>}
             ></FlatList>
             {gameOver && <Button title="New Game" onPress={()=>resetNumber(null)} />}
             <View>{/* LOG ROUNDS */}</View>
@@ -94,4 +98,10 @@ const styles = StyleSheet.create({
     },buttonContainer: {
         flex: 1,
     },
+    roundText: {
+        textAlign: 'center',
+        fontFamily: 'Sofia-Regular',
+        fontSize: 20,
+        color: 'white'
+    }
 });
