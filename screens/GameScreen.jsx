@@ -1,4 +1,4 @@
-import { StyleSheet, Alert, View, Text } from "react-native";
+import { StyleSheet, Alert, View, Text, Button, FlatList  } from "react-native";
 import { useState } from "react";
 import Title from "./components/ui/Title";
 import NumberContainer from "./components/game/NumberContaier";
@@ -21,7 +21,10 @@ let minBoundry = 1, maxBoundry = 100;
 
 export default function GameScreen ({userNumber, resetNumber}) {
 
-    const [currentGuess, setCurrentGuess] = useState( generateRandomNumberBetweenAndWithout(0,100,userNumber) );
+    const initialGuess = generateRandomNumberBetweenAndWithout(0,100,userNumber);
+    const [currentGuess, setCurrentGuess] = useState( initialGuess );
+    const [ guessedNumbers, setGuessedNumbers ] = useState( [initialGuess] );
+    const [gameOver, setGameOver] = useState(false);
 
     function nextGuessHandler (direction) {
 
@@ -40,12 +43,13 @@ export default function GameScreen ({userNumber, resetNumber}) {
         }
         
         const newRandomNumber = generateRandomNumberBetweenAndWithout(minBoundry, maxBoundry, currentGuess);
+        //console.log({direction, currentGuess, userNumber, rounds: guessedNumbers.length, newRandomNumber});
         if(newRandomNumber == userNumber) {
-            resetNumber(null);
-            return Alert.alert("I guessed!", `Your number is ${newRandomNumber}`);
+            setGameOver(true);
+            return Alert.alert(`I guessed in ${guessedNumbers.length} rounds!`, `Your number is ${newRandomNumber}`);
         }
         setCurrentGuess(newRandomNumber);
-        
+        setGuessedNumbers([...guessedNumbers, newRandomNumber]);
     }
 
     return (
@@ -67,6 +71,12 @@ export default function GameScreen ({userNumber, resetNumber}) {
                     </View>
                 </View>
             </Card>
+            <FlatList 
+                data={guessedNumbers}
+                keyExtractor={item=>item}
+                renderItem={({item})=><Text>{item}</Text>}
+            ></FlatList>
+            {gameOver && <Button title="New Game" onPress={()=>resetNumber(null)} />}
             <View>{/* LOG ROUNDS */}</View>
         </View>
     )
