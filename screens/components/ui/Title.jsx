@@ -6,9 +6,8 @@ export default function Title ({children}) {
 
 const styles = StyleSheet.create({
     title: {
-        fontFamily: 'raleway-font' ,
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'Inter-Black' ,
+        fontSize: 28,
         color: 'white',
         textAlign: 'center',
         borderWidth: 2,

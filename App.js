@@ -1,21 +1,34 @@
 import { StyleSheet, SafeAreaView, ImageBackground, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import StartGameScreen from './screens/StartGameScreen';
 import GameScreen from './screens/GameScreen';
 import Colors from './constants/colors';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   
   const [userNumber, setUserNumber] = useState(null);
 
-  const [fontsLoaded] = useFonts({ 
-    'raleway-font':require('./assets/fonts/AlexBrush-Regular.ttf'),
-    'raleway-font-bold':require('./assets/fonts/Raleway-Bold.ttf'),
-   })
+  const [fontsLoaded, fontError] = Font.useFonts({ 
+    'Inter-Black': require('./assets/fonts/Inter-Black.otf'),
+    'Sofia-Regular': require('./assets/fonts/Sofia-Regular.otf'),
+  })
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   function pickedNumberHandler (pickedNumber) {
     setUserNumber(pickedNumber);
@@ -23,7 +36,6 @@ export default function App() {
 
   let screen = <StartGameScreen onPickNumber={pickedNumberHandler} />
 
-  //if(!fontsLoaded) return <Text> LOADINGO!!!!!!....... </Text>;
   if (userNumber) {
     screen = <GameScreen  resetNumber={setUserNumber} userNumber={userNumber} />
   }
@@ -36,7 +48,7 @@ export default function App() {
         style={styles.rootScreen}
         imageStyle={styles.backgroundImage}
         >
-          <SafeAreaView style={styles.rootScreen}>
+          <SafeAreaView onLayout={onLayoutRootView} style={styles.rootScreen}>
              {screen}
           </SafeAreaView>
 

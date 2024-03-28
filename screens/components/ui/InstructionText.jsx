@@ -7,6 +7,7 @@ export default function InstructionText ({children, style}) {
 
 const styles = StyleSheet.create({
     instructionText: {
+        fontFamily: 'Sofia-Regular',
         fontSize: 24,
         color: Colors.accent500
     },
